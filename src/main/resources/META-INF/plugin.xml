@@ -1,0 +1,21 @@
+<idea-plugin>
+    <id>com.pixelagents.pixel-agents-intellij</id>
+    <name>Pixel Agents</name>
+    <vendor>pixelagents</vendor>
+    <version>1.0.0</version>
+    <description><![CDATA[
+        Pixel art office where your Claude Code agents come to life as animated characters.
+        Each Claude Code terminal spawns a character that walks around, sits at desks, and
+        animates based on real-time agent activity.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Pixel Agents"
+                    anchor="right"
+                    icon="/icons/pixel-agents.svg"
+                    factoryClass="com.pixelagents.PixelAgentsToolWindowFactory"/>
+    </extensions>
+</idea-plugin>
