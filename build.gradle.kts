@@ -35,6 +35,7 @@ intellijPlatform {
         description = "Pixel art office where your Claude Code agents come to life as animated characters"
         ideaVersion {
             sinceBuild = "243"
+            untilBuild = "253.*"
         }
     }
 }
