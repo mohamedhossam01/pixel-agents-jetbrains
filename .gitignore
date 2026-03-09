@@ -1,9 +1,25 @@
-out
-dist
-node_modules
-.vscode-test/
-*.vsix
-.claude/
-/logs
-/sprites-export
-.env
+# Build outputs
+build/
+dist/
+out/
+
+# Gradle
+.gradle/
+.kotlin/
+.intellijPlatform/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+webview-ui/node_modules/
+webview-ui/dist/
+*.log
+
+# Privately licensed assets
+raw-assets/
