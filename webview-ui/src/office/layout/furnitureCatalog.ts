@@ -27,6 +27,7 @@ export interface LoadedAssetData {
     canPlaceOnSurfaces?: boolean;
     backgroundTiles?: number;
     canPlaceOnWalls?: boolean;
+    surfaceCells?: [number, number][];
   }>;
   sprites: Record<string, SpriteData>;
 }
@@ -63,6 +64,7 @@ export const FURNITURE_CATALOG: CatalogEntryWithCategory[] = [
     sprite: BOOKSHELF_SPRITE,
     isDesk: false,
     category: 'storage',
+    backgroundTiles: 1,
   },
   {
     type: FurnitureType.PLANT,
@@ -72,6 +74,7 @@ export const FURNITURE_CATALOG: CatalogEntryWithCategory[] = [
     sprite: PLANT_SPRITE,
     isDesk: false,
     category: 'decor',
+    canPlaceOnSurfaces: true,
   },
   {
     type: FurnitureType.COOLER,
@@ -90,6 +93,7 @@ export const FURNITURE_CATALOG: CatalogEntryWithCategory[] = [
     sprite: WHITEBOARD_SPRITE,
     isDesk: false,
     category: 'decor',
+    canPlaceOnWalls: true,
   },
   {
     type: FurnitureType.CHAIR,
@@ -108,6 +112,7 @@ export const FURNITURE_CATALOG: CatalogEntryWithCategory[] = [
     sprite: PC_SPRITE,
     isDesk: false,
     category: 'electronics',
+    canPlaceOnSurfaces: true,
   },
   {
     type: FurnitureType.LAMP,
@@ -117,6 +122,7 @@ export const FURNITURE_CATALOG: CatalogEntryWithCategory[] = [
     sprite: LAMP_SPRITE,
     isDesk: false,
     category: 'decor',
+    canPlaceOnSurfaces: true,
   },
 ];
 
@@ -150,7 +156,7 @@ let dynamicCategories: FurnitureCategory[] | null = null;
 /**
  * Build catalog from loaded assets. Returns true if successful.
  * Once built, all getCatalog* functions use the dynamic catalog.
- * Uses ONLY custom assets (excludes hardcoded furniture when assets are loaded).
+ * Merges custom assets with built-in hardcoded furniture (PC, Desk, Lamp, etc.).
  */
 export function buildDynamicCatalog(assets: LoadedAssetData): boolean {
   if (!assets?.catalog || !assets?.sprites) return false;
@@ -175,6 +181,7 @@ export function buildDynamicCatalog(assets: LoadedAssetData): boolean {
         ...(asset.canPlaceOnSurfaces ? { canPlaceOnSurfaces: true } : {}),
         ...(asset.backgroundTiles ? { backgroundTiles: asset.backgroundTiles } : {}),
         ...(asset.canPlaceOnWalls ? { canPlaceOnWalls: true } : {}),
+        ...(asset.surfaceCells ? { surfaceCells: asset.surfaceCells } : {}),
       };
     })
     .filter((e): e is CatalogEntryWithCategory => e !== null);
@@ -284,8 +291,12 @@ export function buildDynamicCatalog(assets: LoadedAssetData): boolean {
     if (asset.state === 'on') onStateIds.add(asset.id);
   }
 
-  // Store full internal catalog (all variants — for getCatalogEntry lookups)
-  internalCatalog = allEntries;
+  // Merge hardcoded built-in items that don't conflict with loaded assets
+  const loadedIds = new Set(allEntries.map((e) => e.type));
+  const builtInExtras = FURNITURE_CATALOG.filter((e) => !loadedIds.has(e.type));
+
+  // Store full internal catalog (all variants + built-ins — for getCatalogEntry lookups)
+  internalCatalog = [...allEntries, ...builtInExtras];
 
   // Visible catalog: exclude non-front variants and "on" state variants
   const visibleEntries = allEntries.filter(
@@ -302,8 +313,9 @@ export function buildDynamicCatalog(assets: LoadedAssetData): boolean {
     }
   }
 
-  dynamicCatalog = visibleEntries;
-  dynamicCategories = Array.from(new Set(visibleEntries.map((e) => e.category)))
+  const mergedCatalog = [...visibleEntries, ...builtInExtras];
+  dynamicCatalog = mergedCatalog;
+  dynamicCategories = Array.from(new Set(mergedCatalog.map((e) => e.category)))
     .filter((c): c is FurnitureCategory => !!c)
     .sort();
 

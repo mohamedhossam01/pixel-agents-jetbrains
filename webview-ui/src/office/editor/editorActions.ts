@@ -179,9 +179,15 @@ export function canPlaceFurniture(
       if (item.uid === excludeUid) continue;
       const itemEntry = getCatalogEntry(item.type);
       if (!itemEntry || !itemEntry.isDesk) continue;
-      for (let dr = 0; dr < itemEntry.footprintH; dr++) {
-        for (let dc = 0; dc < itemEntry.footprintW; dc++) {
+      if (itemEntry.surfaceCells) {
+        for (const [dc, dr] of itemEntry.surfaceCells) {
           deskTiles.add(`${item.col + dc},${item.row + dr}`);
+        }
+      } else {
+        for (let dr = 0; dr < itemEntry.footprintH; dr++) {
+          for (let dc = 0; dc < itemEntry.footprintW; dc++) {
+            deskTiles.add(`${item.col + dc},${item.row + dr}`);
+          }
         }
       }
     }

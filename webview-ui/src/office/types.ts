@@ -121,6 +121,8 @@ export interface FurnitureCatalogEntry {
   backgroundTiles?: number;
   /** Whether this item can be placed on wall tiles */
   canPlaceOnWalls?: boolean;
+  /** Which cells of this desk accept surface items. Array of [col, row] offsets (0-indexed). If omitted, all cells are surfaces. */
+  surfaceCells?: [number, number][];
 }
 
 export interface PlacedFurniture {
